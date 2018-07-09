@@ -1,9 +1,10 @@
-import csv
+import player as pl
 import urllib.request
+import pandas as pd
 from bs4 import BeautifulSoup
-from player import Player
+from multiprocessing import Pool
 
-URL = "https://new.the-mafia.net"
+URL = "https://the-mafia.net"
 
 def get_html(url):
     response = urllib.request.urlopen(url)
@@ -39,7 +40,7 @@ def get_leagues(club_url):
 
     return leagues
 
-def get_players_info(league_url, players={}):
+def get_players_info(league_url, players=pl.create_player()):
     html = get_html(league_url)
     soup = BeautifulSoup(html, "lxml")
     table = soup.find("table", class_="tournament-table bordered")
@@ -51,29 +52,35 @@ def get_players_info(league_url, players={}):
             for column in row.find_all("td")[1:]:
                 player_info.append(column.text.strip())
 
-            player = Player(*player_info)
-            if player.name in players.keys():
+            player = pl.create_player(*player_info)
+            #search_res = players['Name'].get(player.at[0, 'Name'])
+            search_res = players[players['Name'] == player.at[0, 'Name']].index[0]
+            if search_res != -1:
                 players[player.name].merge(player)
+                pl.merge_info(players.loc[players['Name'] == search_res], player)
             else:
-                players[player.name] = player
+                players = players.append(player, ignore_index=True)
 
     return players
 
 def main():
     clubs = get_clubs(URL + "/?q=clubs_list")
-    players = {}
-
+    i = 0
+    players = pl.create_player()
     for club in clubs:
+        if i == 5:
+            break
         leagues = get_leagues(club)
-        
         for player in leagues:
             try:
                 players = get_players_info(player, players)
             except:
                 pass
+        i += 1
         print(club)
 
-    print("Done!")
+    players.to_csv('maf_stat.csv')
+    print(players)
 
 if __name__ == "__main__":
     main()
