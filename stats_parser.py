@@ -52,35 +52,35 @@ def get_players_info(league_url, players=pl.create_player()):
             for column in row.find_all("td")[1:]:
                 player_info.append(column.text.strip())
 
+            #TO DO: check for colision and correct merging
             player = pl.create_player(*player_info)
-            #search_res = players['Name'].get(player.at[0, 'Name'])
-            search_res = players[players['Name'] == player.at[0, 'Name']].index[0]
-            if search_res != -1:
-                players[player.name].merge(player)
-                pl.merge_info(players.loc[players['Name'] == search_res], player)
+
+            if player['Name'] in players.keys():
+                players[player['Name']] = pl.merge_stats(
+                    players[player['Name']],
+                    player
+                )
             else:
-                players = players.append(player, ignore_index=True)
+                players[player['Name']] = player
 
     return players
 
 def main():
     clubs = get_clubs(URL + "/?q=clubs_list")
-    i = 0
-    players = pl.create_player()
+    players = {}
+    
     for club in clubs:
-        if i == 5:
-            break
         leagues = get_leagues(club)
         for player in leagues:
             try:
                 players = get_players_info(player, players)
             except:
                 pass
-        i += 1
+
         print(club)
 
-    players.to_csv('maf_stat.csv')
-    print(players)
+    players = pl.to_df(players.values())
+    players.to_csv('stats.csv')
 
 if __name__ == "__main__":
     main()

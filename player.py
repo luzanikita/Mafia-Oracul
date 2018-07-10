@@ -4,7 +4,6 @@ import numpy as np
 
 TITLES = [
     'Name',
-    'Score',
     'Bonus',
     'Games',
     'Wins',
@@ -37,49 +36,45 @@ def create_player(
     sheriff="0/0 ",
     don="0/0 "
 ):
-    player = {
-        'Name'        : name,
-        'Score'       : float(score),
-        'Bonus'       : float(bonus),
-        'Games'       : int(games),
-        'Wins'        : int(wins[:wins.index("(")]),
-        'MVP'         : int(mvp),
-        'First_blood' : int(first_blood),
-        'Last_word_3' : int(last_word_3),
-        'Last_word_2' : int(last_word_2),
+    stats = np.array([
+        bonus,
+        games,
+        wins[:wins.index("(")],
+        mvp,
+        first_blood,
+        last_word_3,
+        last_word_2,
+        *convert_role_stats(citizen),
+        *convert_role_stats(mafia),
+        *convert_role_stats(sheriff),
+        *convert_role_stats(don)
+    ], dtype=np.float)
+
+    return {
+        'Name'  : name,
+        'Stats' : stats
     }
 
-    player['Citizen_wins'], player['Citizen_games'] = convert_role(citizen)
-    player['Mafia_wins'], player['Mafia_games'] = convert_role(mafia)
-    player['Sheriff_wins'], player['Sheriff_games'] = convert_role(sheriff)
-    player['Don_wins'], player['Don_games'] = convert_role(don)
+def convert_role_stats(string):
+    return (
+        int(string[:string.index("/")]) +
+        int(string[
+            string.index("/") + 1:
+            string.index(" ")
+        ]),
+        int (string[:string.index("/")])
+    )
 
-    return pd.DataFrame(player, columns=TITLES, index=[0])
+def merge_stats(player1, player2):
+    return {
+        'Name'  : player1['Name'],
+        'Stats' : player1['Stats'] + player2['Stats']
+    }
 
-def convert_role(string):
-        return (
-            int(string[:string.index("/")]) +
-            int(string[
-                string.index("/") + 1:
-                string.index(" ")
-            ]),
-            int (string[:string.index("/")])
-        )
+def split_data(player):
+    return (player['Name'], *tuple(player['Stats']))
 
-def merge_info(player1, player2):
-    p1 = np.array(player1.iloc[:,1:])
-    p2 = np.array(player2.iloc[:,1:])
-    res = pd.DataFrame((p1 + p2), columns=TITLES[1:]) 
-    res.insert(0, 'Name', player1['Name'])
-    
-    return res
+def to_df(players):
+    values = list(map(split_data, players))
 
-def main():
-    player1 = create_player(name="Lu")
-    player2 = create_player(games=4)
-
-    res = merge_info(player1, player2)
-    res.to_csv('stat.csv')
-
-if __name__ == "__main__":
-    main()
+    return pd.DataFrame(values, columns=TITLES)
