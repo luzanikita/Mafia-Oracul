@@ -78,7 +78,7 @@ def main():
         print(club)
 
     players = pl.to_df(players.values())
-    players.to_csv('stats.csv')
+    players.to_csv('../Data/stats.csv')
 
 if __name__ == '__main__':
     main()
