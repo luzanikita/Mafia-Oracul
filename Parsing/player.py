@@ -10,14 +10,14 @@ TITLES = [
     'First_blood',
     'Last_word_3',
     'Last_word_2',
-    'Citizen_wins',
     'Citizen_games',
-    'Mafia_wins',
+    'Citizen_wins',
     'Mafia_games',
-    'Sheriff_wins',
+    'Mafia_wins',
     'Sheriff_games',
-    'Don_wins',
-    'Don_games'
+    'Sheriff_wins',
+    'Don_games',
+    'Don_wins'
 ]
 
 def create_player(

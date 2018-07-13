@@ -64,7 +64,7 @@ def get_players_info(league_url, players=pl.create_player()):
 
 def main():
     clubs = get_clubs(URL + '/?q=clubs_list')
-    players = pl.create_player()
+    players = {'Гость': pl.create_player()}
     
     for club in clubs:
         leagues = get_leagues(club)
@@ -78,7 +78,7 @@ def main():
         print(club)
 
     players = pl.to_df(players.values())
-    players.to_csv('../Data/stats.csv')
+    players.to_csv('Data/stats.csv')
 
 if __name__ == '__main__':
     main()

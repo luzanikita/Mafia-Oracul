@@ -124,7 +124,7 @@ def main():
         
             print(league)
     
-    games.to_csv('../Data/games.csv')
+    games.to_csv('Data/games.csv')
 
 if __name__ == '__main__':
     main()

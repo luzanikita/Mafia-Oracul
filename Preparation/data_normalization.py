@@ -18,7 +18,7 @@ def main():
         [players_stats['Name'], normal_stats],
         axis=1)
 
-    players_stats.to_csv('../Data/normal_stats.csv')
+    players_stats.to_csv('Data/normal_stats.csv')
 
 if __name__ == '__main__':
     main()
