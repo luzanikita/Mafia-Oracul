@@ -79,19 +79,20 @@ def get_game_info(game_url):
             .find('dd')\
             .text\
             .strip()
-
-        for row in table.find_all('tr', class_='col1'):
+        
+        #TODO: implement map-reduce
+        for i, row in enumerate(table.find_all('tr', class_='col1'), 1):
             nick = row.find('td', class_='col2').text.strip()
             role = row.find('td', class_='col5').text.strip()
 
             if role == "":
-                citizen.append(nick)
+                citizen.append((i,nick))
             elif role == "М":
-                mafia.append(nick)
+                mafia.append((i,nick))
             elif role== "Д":
-                don = nick
+                don = (i,nick)
             elif role == "Ш":
-                sheriff = nick
+                sheriff = (i,nick)
 
         return G.create_game(
             game_result,
@@ -105,6 +106,7 @@ def main():
     clubs = get_clubs(URL + '/?q=clubs_list')
     games = pd.DataFrame(columns=G.TITLES)
 
+    #TODO: implement map-reduce
     for club in clubs:
         leagues = get_leagues(club)
 
