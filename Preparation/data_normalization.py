@@ -8,7 +8,7 @@ def to_normal(series):
     return series
 
 def main():
-    players_stats = pd.read_csv('../Data/stats.csv')
+    players_stats = pd.read_csv('Data/stats.csv')
 
     normal_stats = players_stats\
         .iloc[:,2:]\

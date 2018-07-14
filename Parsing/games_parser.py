@@ -1,7 +1,8 @@
 import urllib.request
 import pandas as pd
-from bs4 import BeautifulSoup
 import game as G
+from bs4 import BeautifulSoup
+from multiprocessing import Pool 
 
 URL = 'https://the-mafia.net'
 
