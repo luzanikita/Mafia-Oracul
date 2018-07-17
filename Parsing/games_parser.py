@@ -1,8 +1,10 @@
 import urllib.request
 import pandas as pd
 import game as G
+import multiproc as mp
 from bs4 import BeautifulSoup
 from multiprocessing import Pool 
+import time
 
 URL = 'https://the-mafia.net'
 
@@ -80,7 +82,6 @@ def get_game_info(game_url):
             .text\
             .strip()
         
-        #TODO: implement map-reduce
         for i, row in enumerate(table.find_all('tr', class_='col1'), 1):
             nick = row.find('td', class_='col2').text.strip()
             role = row.find('td', class_='col5').text.strip()
@@ -102,7 +103,35 @@ def get_game_info(game_url):
             sheriff
         )
 
+# def main():
+#     t1 = time.time()
+
+#     clubs = get_clubs(URL + '/?q=clubs_list')
+#     p = Pool(1)
+
+#     leagues_lists = p.map(mp.map_clubs, clubs)
+#     leagues = []
+#     [ leagues.extend(l) for l in leagues_lists] 
+
+#     games_lists = p.map(mp.map_leagues, leagues)
+#     games = []
+#     [ games.extend(g) for g in games_lists] 
+
+#     print(time.time() - t1)
+#     t1 = time.time()
+
+#     result = p.map(mp.map_games, games)
+#     games = pd.DataFrame(columns=G.TITLES)
+#     games = games.append(result, ignore_index=True)
+
+#     games.to_csv('Data/games.csv')
+
+#     print(time.time() - t1)
+#     t1 = time.time()
+
 def main():
+    t1 = time.time()
+    t2 = time.time()
     clubs = get_clubs(URL + '/?q=clubs_list')
     games = pd.DataFrame(columns=G.TITLES)
 
@@ -125,9 +154,12 @@ def main():
             except:
                 pass
         
-            print(league)
+            print(time.time() - t1)
+            t1 = time.time()
     
-    games.to_csv('Data/games.csv')
+    games.to_csv('Data/games1.csv')
+    print(time.time() - t2)
 
 if __name__ == '__main__':
+    
     main()
