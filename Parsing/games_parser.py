@@ -91,9 +91,9 @@ def get_game_info(game_url):
             elif role == "М":
                 mafia.append((i,nick))
             elif role== "Д":
-                don = (i,nick)
+                don = [(i,nick)]
             elif role == "Ш":
-                sheriff = (i,nick)
+                sheriff = [(i,nick)]
 
         return G.create_game(
             game_result,
@@ -103,39 +103,12 @@ def get_game_info(game_url):
             sheriff
         )
 
-# def main():
-#     t1 = time.time()
-
-#     clubs = get_clubs(URL + '/?q=clubs_list')
-#     p = Pool(1)
-
-#     leagues_lists = p.map(mp.map_clubs, clubs)
-#     leagues = []
-#     [ leagues.extend(l) for l in leagues_lists] 
-
-#     games_lists = p.map(mp.map_leagues, leagues)
-#     games = []
-#     [ games.extend(g) for g in games_lists] 
-
-#     print(time.time() - t1)
-#     t1 = time.time()
-
-#     result = p.map(mp.map_games, games)
-#     games = pd.DataFrame(columns=G.TITLES)
-#     games = games.append(result, ignore_index=True)
-
-#     games.to_csv('Data/games.csv')
-
-#     print(time.time() - t1)
-#     t1 = time.time()
-
 def main():
     t1 = time.time()
     t2 = time.time()
     clubs = get_clubs(URL + '/?q=clubs_list')
     games = pd.DataFrame(columns=G.TITLES)
 
-    #TODO: implement map-reduce
     for club in clubs:
         leagues = get_leagues(club)
 
@@ -147,17 +120,16 @@ def main():
                     games_list = get_games(games_url)
 
                 for game in games_list:
-                    
-                        games = games.append(
-                            get_game_info(game),
-                            ignore_index=True)
+                    games = games.append(
+                        get_game_info(game),
+                        ignore_index=True)
             except:
                 pass
         
             print(time.time() - t1)
             t1 = time.time()
     
-    games.to_csv('Data/games1.csv')
+    games.to_csv('Data/games.csv')
     print(time.time() - t2)
 
 if __name__ == '__main__':
