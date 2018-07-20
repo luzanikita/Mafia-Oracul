@@ -22,25 +22,29 @@ def merge_info(players, game, role):
         info = np.append(info, [i[0] / 10., *norm_role])
         result.append(info)
 
-    return np.array(result)
+    return np.concatenate(tuple(result))
 
 
 def make_set(players, games):
-    result = []
+    result = np.empty((0, 180), dtype=float)
     roles = ['Citizen', 'Sheriff', 'Mafia', 'Don']
 
     for _, game in games.iterrows():
         inputs = [merge_info(players, game, role) for role in roles]
-        result.append(inputs)
+        inputs = np.array([np.concatenate(tuple(inputs))])
+        if np.shape(inputs) == (1, 180):
+            result = np.append(result, inputs, axis=0)
 
-    return result
+    return np.array(result)
 
 def main():
     players = pd.read_csv('Data/normal_stats.csv')
     games = pd.read_csv('Data/games.csv')
     players = players.iloc[:,1:]
 
-    my_set = make_set(players, games.iloc[0:3])
+    my_set = make_set(players, games.iloc[:])
+    pass
+    print(my_set)
     print(np.shape(my_set))
 
 if __name__ == '__main__':
