@@ -41,11 +41,19 @@ def main():
     players = pd.read_csv('Data/normal_stats.csv')
     games = pd.read_csv('Data/games.csv')
     players = players.iloc[:,1:]
+    lenght = games.shape[0]
 
-    my_set = make_set(players, games.iloc[:])
-    pass
-    print(my_set)
-    print(np.shape(my_set))
+    test_range = list(filter(lambda x: x % 3 == 0, range(lenght)))
+    training_range = list(filter(lambda x: x % 3 != 0, range(lenght)))
+
+    testing = make_set(players, games.iloc[test_range])
+    training = make_set(players, games.iloc[training_range])
+
+    print(np.shape(testing))
+    print(np.shape(training))
+
+    np.save('Data/test', testing)
+    np.save('Data/train', training)
 
 if __name__ == '__main__':
     main()
