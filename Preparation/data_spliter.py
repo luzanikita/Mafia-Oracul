@@ -26,31 +26,40 @@ def merge_info(players, game, role):
 
 
 def make_set(players, games):
-    result = np.empty((0, 180), dtype=float)
+    result = np.empty((0, 181), dtype=float)
     roles = ['Citizen', 'Sheriff', 'Mafia', 'Don']
-
+    
     for _, game in games.iterrows():
+        target = np.array(game.at['Game_result'], ndmin=2)
         inputs = [merge_info(players, game, role) for role in roles]
         inputs = np.array([np.concatenate(tuple(inputs))])
-        if np.shape(inputs) == (1, 180):
+        inputs = np.append(inputs, target, axis=1)
+        if np.shape(inputs) == (1, 181):
             result = np.append(result, inputs, axis=0)
 
     return np.array(result)
 
+def get_results(games):
+    result = games.loc[:,'Game_result'].copy()
+    result.loc[result == 'мафия'] = 0.
+    result.loc[result == 'город'] = 1.
+    
+    return result.as_matrix()
+    
 def main():
     players = pd.read_csv('Data/normal_stats.csv')
     games = pd.read_csv('Data/games.csv')
     players = players.iloc[:,1:]
     lenght = games.shape[0]
 
+    games.loc[games['Game_result'] == 'мафия', 'Game_result'] = 0.
+    games.loc[games['Game_result'] == 'город', 'Game_result'] = 1.
+
     test_range = list(filter(lambda x: x % 3 == 0, range(lenght)))
     training_range = list(filter(lambda x: x % 3 != 0, range(lenght)))
 
     testing = make_set(players, games.iloc[test_range])
     training = make_set(players, games.iloc[training_range])
-
-    print(np.shape(testing))
-    print(np.shape(training))
 
     np.save('Data/test', testing)
     np.save('Data/train', training)
